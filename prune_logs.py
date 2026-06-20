@@ -35,7 +35,7 @@ if __name__ == "__main__":
             count = int(sys.argv[1])
         except ValueError:
             pass
-    
+
     print(f"Pruning logs, keeping last {count}...")
     prune_logs(count)
     print("Pruning complete.")

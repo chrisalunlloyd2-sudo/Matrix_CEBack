@@ -32,7 +32,7 @@ def generate_oauth2_string(email, refresh_token):
 def connect_imap(config):
     try:
         mail = imaplib.IMAP4_SSL(config['imap_host'], config['imap_port'])
-        
+
         password = config['password']
         if password.startswith("oauth2:"):
             # Lightweight OAuth2 Refresh Pattern
@@ -42,16 +42,16 @@ def connect_imap(config):
             # For Gmail we'd need a separate endpoint, but we follow the user's pattern
             # For now, we attempt to refresh using the common script
             subprocess.run(["bash", refresh_script], check=True, capture_output=True)
-            
+
             # Re-load updated config
             updated_config = load_config()
             access_token = updated_config.get('github_token') # Shared token logic or specific one
-            
+
             auth_string = f'user={config["email"]}\1auth=Bearer {access_token}\1\1'
             mail.authenticate('XOAUTH2', lambda x: auth_string)
         else:
             mail.login(config['email'], config['password'])
-        
+
         return mail
     except Exception as e:
         print(f"[-] IMAP Connection Error: {e}")
@@ -61,7 +61,7 @@ def harvest_emails(mail, email_address):
     mail.select("inbox")
     # Search for emails from the user to the user
     status, messages = mail.search(None, f'(FROM "{email_address}" TO "{email_address}")')
-    
+
     if status != 'OK':
         print("[-] Search failed.")
         return []
@@ -70,14 +70,14 @@ def harvest_emails(mail, email_address):
     for num in messages[0].split():
         status, data = mail.fetch(num, '(RFC822)')
         if status != 'OK': continue
-        
+
         msg_body = data[0][1].decode('utf-8', errors='ignore')
-        
+
         # Extract TODO, FIX, LEARN
         todos = re.findall(r'TODO:\s*(.*)', msg_body, re.IGNORECASE)
         fixes = re.findall(r'FIX:\s*(.*)', msg_body, re.IGNORECASE)
         learns = re.findall(r'LEARN:\s*(.*)', msg_body, re.IGNORECASE)
-        
+
         for t in todos: task_list.append({"type": "TODO", "content": t.strip(), "source": "gmail"})
         for f in fixes: task_list.append({"type": "FIX", "content": f.strip(), "source": "gmail"})
         for l in learns: task_list.append({"type": "LEARN", "content": l.strip(), "source": "gmail"})
