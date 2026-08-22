@@ -15,6 +15,7 @@ OAUTH_FILE = "/data/data/com.termux/files/home/.gemini/oauth_creds.json"
 PROJECT_ROOT = "/data/data/com.termux/files/home/KAI_9000/Sprite"
 
 def get_oauth_token():
+    """Get oauth token (function)."""
     if not os.path.exists(OAUTH_FILE):
         return None
 
@@ -44,6 +45,10 @@ def get_oauth_token():
     return token
 
 def github_api_request(method, endpoint, data=None):
+    """Github api request.
+
+    Args: method, endpoint, data.
+    """
     token = get_oauth_token()
     if not token:
         print("[-] Error: GitHub OAuth token missing.")
