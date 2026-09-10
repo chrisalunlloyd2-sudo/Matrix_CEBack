@@ -16,7 +16,6 @@ CONFIG_FILE = "/data/data/com.termux/files/home/KAI_9000/config/email_settings.j
 MEMORY_FILE = "/data/data/com.termux/files/home/KAI_9000/memory/harvested_tasks.jsonl"
 
 def load_config():
-    """Load config (function)."""
     if not os.path.exists(CONFIG_FILE):
         print(f"[-] Error: Email config not found at {CONFIG_FILE}")
         return None
@@ -28,17 +27,9 @@ def generate_oauth2_string(email, refresh_token):
     # In a real implementation, we would use the refresh_token to get an access_token
     # and then format it as: 'user={email}\1auth=Bearer {access_token}\1\1'
     # For now, we assume the user will provide a valid access token or we use a helper.
-    """Generate oauth2 string.
-
-    Args: email, refresh_token.
-    """
     pass
 
 def connect_imap(config):
-    """Connect imap.
-
-    Args: config.
-    """
     try:
         mail = imaplib.IMAP4_SSL(config['imap_host'], config['imap_port'])
 
@@ -67,10 +58,6 @@ def connect_imap(config):
         return None
 
 def harvest_emails(mail, email_address):
-    """Harvest emails.
-
-    Args: mail, email_address.
-    """
     mail.select("inbox")
     # Search for emails from the user to the user
     status, messages = mail.search(None, f'(FROM "{email_address}" TO "{email_address}")')
@@ -98,10 +85,6 @@ def harvest_emails(mail, email_address):
     return task_list
 
 def save_tasks(tasks):
-    """Save tasks.
-
-    Args: tasks.
-    """
     if not tasks: return
     os.makedirs(os.path.dirname(MEMORY_FILE), exist_ok=True)
     with open(MEMORY_FILE, 'a') as f:
